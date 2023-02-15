@@ -38,7 +38,7 @@ import lib:global/utils as utils
 
 defer = ctx.inject(Defer)
 ASSETS_PATH = ctx.directory / f"rp/assets/mcgame"
-CURRENT_PATH = ctx.directory / "src/data/lib/modules/gui/hud"
+CURRENT_PATH = ctx.directory / "src/data/lib/modules/gui"
 NAMESPACE = f"mcgame:shader"
 
 
@@ -220,6 +220,7 @@ def deferred_shaders():
             text = Shader(source_path=shader_path).text
             frag_main.text += f"    control_color = texelFetch(ControlSampler, ivec2(0, {elem.channel}), 0);\n"
             frag_main.text += f"    if(control_color.b != 0.0) {{\n"
+            frag_main.text += f"float score = control_color.b;\n"
             frag_main.text += f"{text}"
             frag_main.text += f"\n    }}\n\n    "
         

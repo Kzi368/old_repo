@@ -103,7 +103,7 @@ class ActionbarElement:
     def disable(self, player):
         target = utils.selector(player)
         execute as target:
-            for player_id in generate_tree(range(ctx.meta.config.actionbar.max_players)):
+            for player_id in generate_tree(range(ctx.meta.config.max_players)):
                 append function player_id.parent:
                     if player_id.partition(4):
                         if score var Scoreboard("player_id")["@s"] matches player_id.range function player_id.children
@@ -178,7 +178,7 @@ class UnicodeBar(ActionbarElement):
         @defer
         def _position_bars():
             execute as target:
-                for player_id in generate_tree(range(ctx.meta.config.actionbar.max_players), root=_root):
+                for player_id in generate_tree(range(ctx.meta.config.max_players), root=_root):
                     append function player_id.parent:
                         if player_id.partition(4):
                             if score var Scoreboard("player_id")["@s"] matches player_id.range function player_id.children
@@ -237,7 +237,7 @@ class UnicodeIcon(ActionbarElement):
 
         target = utils.selector(player)
         execute as target:
-            for player_id in generate_tree(range(ctx.meta.config.actionbar.max_players)):
+            for player_id in generate_tree(range(ctx.meta.config.max_players)):
                 append function player_id.parent:
                     if player_id.partition(4):
                         if score var Scoreboard("player_id")["@s"] matches player_id.range function player_id.children
@@ -250,7 +250,7 @@ class UnicodeIcon(ActionbarElement):
 def display(player):
     target = utils.selector(player)
     execute as target:
-        for player_id in generate_tree(range(ctx.meta.config.actionbar.max_players)):
+        for player_id in generate_tree(range(ctx.meta.config.max_players)):
             append function player_id.parent:
                 if player_id.partition(4):
                     if score var Scoreboard("player_id")["@s"] matches player_id.range function player_id.children
@@ -266,7 +266,7 @@ init_function = utils.init_func()
 def deferred_actionbars():
     if len(ActionbarElement.all_elements) != 0:
         empty_data = ""
-        for i in range(ctx.meta.config.actionbar.max_players):
+        for i in range(ctx.meta.config.max_players):
             empty_data += f'{i}:['
             for j in range(len(ActionbarElement.all_elements)):
                 empty_data += f'{"None"},'

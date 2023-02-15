@@ -13,10 +13,7 @@
         "name": "MCGame Data",
         "load": [
             "src"
-        ],
-        "render": {
-            "functions": []
-        }
+        ]
     },
     "resource_pack": {
         "name": "MCGame Resources",
@@ -42,9 +39,6 @@
         "mecha"
     ],
     "meta": {
-        "mecha": {
-            "multiline": true
-        },
         "config": {
             "max_players": 8
         }
