@@ -1,0 +1,52 @@
+{
+    "output": "pack_out",
+    "name": "mcgame",
+    "description": "The Minecraft game framework",
+    "author": "Casiel368",
+    "version": "0.0.1",
+    "require": [
+        "mecha.contrib.lint_basic",
+        "bolt",
+        "bolt_expressions"
+    ],
+    "data_pack": {
+        "name": "MCGame Data",
+        "load": [
+            "src"
+        ],
+        "render": {
+            "functions": []
+        }
+    },
+    "resource_pack": {
+        "name": "MCGame Resources",
+        "load": [
+            "rp"
+        ]
+    },
+    "pipeline": [
+        {
+            "pipeline": [
+                "beet.contrib.babelbox"
+            ],
+            "meta": {
+                "babelbox": {
+                    "load": [
+                        "rp/assets/babelbox/custom/*.csv",
+                        "rp/assets/babelbox/custom/**/*.csv"
+                    ],
+                    "filename_prefix": true
+                }
+            }
+        },
+        "mecha"
+    ],
+    "meta": {
+        "mecha": {
+            "multiline": true
+        },
+        "config": {
+            "max_players": 8
+        }
+    }
+}
