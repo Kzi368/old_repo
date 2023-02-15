@@ -21,7 +21,7 @@ import lib:global/utils as utils
 
 runtime = ctx.inject(Runtime)
 defer = ctx.inject(Defer)
-ASSETS_PATH = ctx.directory / f"rp/assets/mcgame"
+ASSETS_PATH = ctx.directory / f"res/assets/mcgame"
 CURRENT_PATH = ctx.directory / "src/data/lib/modules/gui"
 NAMESPACE = f"mcgame:actionbar"
 
