@@ -1325,3 +1325,7 @@ pack_out/MCGame Resources/assets/space/textures/font/space_nosplit.png
 pack_out/MCGame Resources/assets/space/textures/font/space_split.png
 third parties.txt
 f5_to_run.bat
+src/data/core/functions/effect.mcfunction
+src/data/core/functions/effect2.mcfunction
+src/data/core/functions/init.mcfunction
+src/data/core/functions/main.mcfunction

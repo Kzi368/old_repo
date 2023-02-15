@@ -1,7 +1,7 @@
 import numpy as np
 import lib:animation/particle_fx as part
 
-PI = 3.141592
+PI = 3.1415926
 
 def f(t):
     return np.array([0.0, t/PI, 0.0])
