@@ -1,8 +1,8 @@
+res/assets/mcgame/
+res/assets/babelbox/
 tests/
 pack_out/MCGame Data/
 pack_out/MCGame Resources/
 third parties.txt
 f5_to_run.bat
 src/data/core/
-rp/assets/mcgame/
-rp/assets/babelbox/

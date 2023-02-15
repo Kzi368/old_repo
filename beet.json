@@ -18,7 +18,7 @@
     "resource_pack": {
         "name": "MCGame Resources",
         "load": [
-            "rp"
+            "res"
         ]
     },
     "pipeline": [
