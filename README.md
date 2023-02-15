@@ -1,19 +1,31 @@
-"# MCGame"
+# MCGame
 
-This framework uses:
+> A Minecraft game framework.
 
-Beet
+## Introduction
 
-Mecha
+MCGame is a framework that aims for simplifying the development process of a Minecraft map.
 
-Bolt
+This software is in a very early stage. It is being worked on still.
 
-Bolt Expressions
+## Installation
 
-Babelbox
+No installation yet...
 
-AmberW's negative space
+## About
 
-PuckiSilver's NoShadow
+This project uses the following pieces of software:
 
-Cloudwolf & Der Discohund's shader toggler
+- [Beet](https://github.com/mcbeet/beet)
+- [Mecha](https://github.com/mcbeet/mecha)
+- [Bolt](https://github.com/mcbeet/bolt)
+- [Bolt Expressions](https://github.com/rx-modules/bolt-expressions)
+- [Babelbox](https://github.com/OrangeUtan/babelbox)
+- [Negative Space Font](https://github.com/AmberWat/NegativeSpaceFont)
+- [NoShadow](https://github.com/PuckiSilver/NoShadow)
+- [Shader SelectorV2](https://github.com/CloudWolfYT/ShaderSelectorV2)
+- More in the future...
+
+---
+
+Licence - [MIT](https://github.com/Kzi368/MCGame/blob/main/LICENSE)
