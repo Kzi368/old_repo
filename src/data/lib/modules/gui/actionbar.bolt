@@ -250,7 +250,6 @@ def deferred_actionbars():
         empty_data = "{" + empty_data[0:-1] + "}"
         empty_data = parse_nbt(empty_data)
         function init_function:
-            say DOUUU
             data merge storage NAMESPACE empty_data
         
 
