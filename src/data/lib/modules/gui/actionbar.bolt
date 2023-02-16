@@ -24,7 +24,7 @@ defer = ctx.inject(Defer)
 ASSETS_PATH = ctx.directory / f"res/assets/mcgame"
 CURRENT_PATH = ctx.directory / "src/data/lib/modules/gui"
 NAMESPACE = f"mcgame:actionbar"
-
+textures = ctx.assets.textures
 
 
 def _id_generator(input=None):
@@ -53,38 +53,53 @@ def _condition_image(image):
 
     if image_vec[0][0][3] == 0:
         image_vec[0][0][3] = 1
-    if image_vec[0][width - 1][3] == 0:
-        image_vec[0][width - 1][3] = 1
+    if image_vec[0][-1][3] == 0:
+        image_vec[0][-1][3] = 1
 
     return Image.fromarray(image_vec)
 
+def _expand_down(image, n):
+    image_vec = np.array(image)
+    width = len(image_vec[0])
+    image_vec = np.vstack((image_vec, np.zeros((n, width, 4), dtype=np.uint8)))
+    image_vec[-1][0][3] = 1
+    image_vec[-1][-1][3] = 1
+    return Image.fromarray(image_vec)
 
-def _fill_horizontal_png(path_full, path_empty, start, end, steps):
-    image_full = np.array(_condition_image(Image.open(path_full).convert("RGBA")))
-    image_empty = np.array(_condition_image(Image.open(path_empty).convert("RGBA")))
-    step_size = (end - start + 1) / (steps + 1)
+def fill_horizontal_png(images, parameters, steps, step):
+    image_full = np.array(images[0])
+    image_empty = np.array(images[1])
+    start = parameters[0]
+    end = parameters[1]
+    step_size = (end - start) / (steps)
 
-    for step in range(steps + 1):
+    
+    if step_size >= 0:
+        image_out = image_empty.copy()
+        image_out[:, :round(start + step * step_size)] = image_full[:, :round(start + step * step_size)]
+    else:
         image_out = image_full.copy()
-        order = tuple(sorted((round(start + step * step_size), end)))
-        
-        image_out[:, order[0]:order[1]] = image_empty[:, order[0]:order[1]]
+        image_out[:, :round(start + step * step_size)] = image_empty[:, :round(start + step * step_size)]
 
-        yield Image.fromarray(image_out)
+    return Image.fromarray(image_out)
 
 
-def _fill_vertical_png(path_full, path_empty, start, end, steps):
-    image_full = np.array(_condition_image(Image.open(path_full).convert("RGBA")))
-    image_empty = np.array(_condition_image(Image.open(path_empty).convert("RGBA")))
-    step_size = (start - end + 1) / (steps + 1)
+def fill_vertical_png(images, parameters, steps, step):
+    image_full = np.array(images[0])
+    image_empty = np.array(images[1])
+    start = parameters[0]
+    end = parameters[1]
+    step_size = (end - start) / (steps)
 
-    for step in range(steps + 1):
+    
+    if step_size >= 0:
+        image_out = image_empty.copy()
+        image_out[:round(start + step * step_size)] = image_full[:round(start + step * step_size)]
+    else:
         image_out = image_full.copy()
-        order = tuple(sorted((round(end + step * step_size), start)))
-        
-        image_out[order[0]:order[1]] = image_empty[order[0]:order[1]]
+        image_out[:round(start + step * step_size)] = image_empty[:round(start + step * step_size)]
 
-        yield Image.fromarray(image_out)
+    return Image.fromarray(image_out)
 
 
 class ActionbarElement:
@@ -124,43 +139,35 @@ class UnicodeBar(ActionbarElement):
         self.source = source
         self.max = max
         UnicodeBar.all_elements.add(self)
-
-    def generate_horizontal(self, start_pixel, end_pixel, steps, directory=""):
-        self.fill = _fill_horizontal_png
-        self.type = "generated"
-        self.directory = ASSETS_PATH / directory
-        self.image = PIL.Image.open(self.directory / (str(self.name) + "_full.png"))
-#        try:
-#            self.image = PIL.Image.open(self.directory / (str(self.name) + "_full.png"))
-#        except:
-#            raise Exception(f"Couldn't load file {ASSETS_PATH / directory / (str(self.name) + '_full.png'}")
-        self.start_pixel = start_pixel
-        self.end_pixel = end_pixel
-        self.steps = steps
-        self.res_x = self.image.size[0]
-        self.res_y = max(self.image.size[1], 65)
-
-    def generate_vertical(self, start_pixel, end_pixel, steps, directory=""):
-        self.fill = _fill_vertical_png
-        self.type = "generated"
-        self.directory = ASSETS_PATH / directory
-        self.image = PIL.Image.open(self.directory / (str(self.name) + "_full.png"))
-        self.start_pixel = start_pixel
-        self.end_pixel = end_pixel
-        self.steps = steps
-        self.res_x = self.image.size[0]
-        self.res_y = max(self.image.size[1], 65)
+        self.images = []
+        while len(self.images) > self.max + 1:
+            self.images.append(None)
     
-    def premade_source(self, directory=""):
-        self.type = "premade"
-        self.directory = ASSETS_PATH / directory
-        self.image_list = []
-        for n in range(self.max + 1):
-            self.image_list.append(PIL.Image.open(self.directory / (str(self.name) + "_"+ str(n) + ".png")))  # De vuelta el try-except
-        
-        self.res_x = self.image_list[0].size[0]
-        self.res_y = max(self.image_list[0].size[1], 65)
+    def generate(self, function, list, parameters):
+        # "list" is a list of directories that point to images.
+        # "parameters" is a list.
+        # "function" takes in the images in "list", "parameters" and an integer.
+        images = []
+        for elem in list:
+            images.append(_condition_image(PIL.Image.open(ASSETS_PATH / elem).convert("RGBA")))
 
+        self.res_x = images[0].size[0]
+        self.res_y = images[0].size[1]
+        self.size_y = PIL.Image.open(ASSETS_PATH / list[0]).size[1]
+
+        self.images = []
+
+        for n in range(self.max + 1):
+            self.images.append(function(images, parameters, self.max, n))
+
+    def fetch_frame(self, directory, frame):
+        image = _condition_image(PIL.Image.open(ASSETS_PATH / directory).convert("RGBA"))
+        
+        self.res_x = image.size[0]
+        self.res_y = image.size[1]
+        self.size_y = PIL.Image.open(ASSETS_PATH / directory).size[1]
+
+        self.images[frame] = image
 
     def update(self, player, position_x, position_y):  # Selector = jugador al que se actualiza
         # Agregar la posición y al conjunto de posibles posiciones y (léase "y" como variable).
@@ -215,38 +222,6 @@ class UnicodeBar(ActionbarElement):
                                                 data modify storage NAMESPACE f"{player_id.value}[{self.id}]" set value stored_text
 
 
-class UnicodeIcon(ActionbarElement):
-    all_elements = set()
-
-    def __init__(self, name, directory=""):
-        ActionbarElement.__init__(self, name)
-        UnicodeIcon.all_elements.add(self)
-
-        self.image = PIL.Image.open(ASSETS_PATH / directory / (str(self.name) + ".png"))
-        self.res_x = self.image.size[0]
-        self.res_y = self.image.size[1]
-
-    def enable(self, player, position_x, position_y):  # Selector = jugador al que se actualiza
-        generate_entry = ctx.inject(_unicode_generator)
-        self.possible_y[position_y] = next(generate_entry)
-
-        q = 0
-        if (self.res_x % 2) == 1:
-            q = 1
-        offset_x = position_x + (self.res_x // 2) + q
-
-        target = utils.selector(player)
-        execute as target:
-            for player_id in generate_tree(range(ctx.meta.config.max_players)):
-                append function player_id.parent:
-                    if player_id.partition(4):
-                        if score var Scoreboard("player_id")["@s"] matches player_id.range function player_id.children
-                    else:
-                        if score var Scoreboard("player_id")["@s"] matches player_id.value:
-                            stored_text = f'{{"translate":"offset.{offset_x}","with":[{{"text":"{self.possible_y[position_y]}","color":"#4e5c24"}}]}}'
-                            data modify storage NAMESPACE f"{player_id.value}[{self.id}]" set value stored_text
-
-
 def display(player):
     target = utils.selector(player)
     execute as target:
@@ -268,56 +243,47 @@ def deferred_actionbars():
         empty_data = ""
         for i in range(ctx.meta.config.max_players):
             empty_data += f'{i}:['
-            for j in range(len(ActionbarElement.all_elements)):
+            for j in ActionbarElement.all_elements:
                 empty_data += f'{"None"},'
             empty_data = empty_data[0:-1]
             empty_data += f'],'
         empty_data = "{" + empty_data[0:-1] + "}"
         empty_data = parse_nbt(empty_data)
-        
         function init_function:
+            say DOUUU
             data merge storage NAMESPACE empty_data
         
 
-        textures = ctx.assets.textures
         languages = ctx.assets.languages
         fonts = ctx.assets.fonts
 
 
         for element in UnicodeBar.all_elements:
-            if element.type == "generated":
-                sprites = element.fill(element.directory / (str(element.name) + "_full.png"),
-                                       element.directory / (str(element.name) + "_empty.png"),
-                                       element.start_pixel, element.end_pixel, element.max)
-            else:
-                def _iterator(list):
-                    i = 0
-                    while True:
-                        yield _condition_image(list[i])
-                        i += 1
-                sprites = _iterator(element.image_list)
-
-            for n in range(element.max + 1):
-                font_namespace = f"mcgame:font/{element.name}_{n}"
-                textures[font_namespace] = Texture(next(sprites))
-            
-
             for height in element.possible_y:
                 for amount, unicode_id in enumerate(element.possible_y[height]):
+                    difference = height + max(element.res_y - 65, 0) - element.size_y + 1 - element.res_y
+                    font_namespace = f"mcgame:font/{element.name}_{amount}"
+                    final_height = element.res_y
+                    if final_height > 256:
+                        raise ValueError(f"{element.name} image is too tall. Maximum image height is 256 pixels.")
+                    if difference > 0:
+                        textures[font_namespace] = Texture(_expand_down(element.images[amount], difference))
+                        final_height += difference
+                        if final_height > 256:
+                            raise ValueError(f"{element.name} is being updated too high. It should be {height + max(element.res_y - 65, 0) - element.size_y + 1 - 256} pixels below.")
+                    else:
+                        textures[font_namespace] = Texture(element.images[amount])
                     merge font minecraft:default {
                         "providers": [
                             {
                                 "type": "bitmap",
                                 "file": f"mcgame:font/{element.name}_{amount}.png",
-                                "ascent": (height + max(element.res_y - 65, 0)),
-                                "height": element.res_y,
+                                "ascent": (height + max(element.res_y - 65, 0) - element.size_y + 1),
+                                "height": final_height,
                                 "chars": [unicode_id]
                             }
                         ]
                     }
-
-        for element in UnicodeIcon.all_elements:
-            pass
 
 
         textures["space:font/space_nosplit"] = Texture(source_path = CURRENT_PATH / "private/actionbar/space_nosplit.png")

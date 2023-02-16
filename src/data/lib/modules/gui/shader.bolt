@@ -8,33 +8,6 @@ from bolt_expressions import Scoreboard
 import lib:global/scoreboard as scb
 import lib:global/utils as utils
 
-# Documentación:
-# Esta librería crea shaders de forma dinámica.
-# Un shader se puede crear corriendo este comando:
-# foo = PostShader(source, min, max, name)
-# source: bolt expression. Es el scoreboard que le da los valores al shader.
-# min: valor mínimo que lee el shader.
-# max: valor máximo que lee el shader.
-# name: nombre del shader.
-#
-# Todos los parámetros son obligatorios.
-# En una función luego se escribe foo.update() (o se agrega el shdr. si
-# es en un archivo que importa esta librería) para que el shader lea
-# lo que hay en el scoreboard. Es importante que el update esté dentro
-# de una función con un @s ya definido
-# 
-# El shader en sí mismo se agrega a la carpeta shaders. Cada línea debe
-# empezar con 8 espacios. El parámetro que lleva el número leído del
-# scoreboard es control_color.b.
-# Si se quiere usar el parámetro de tiempo, hay que leer los colores del
-# ControlSampler en la fila 1.
-#
-# Para crear un overlay, se agrega una imagen en formato .png a la carpeta
-# shaders/overlays. Es preferible que su nombre empiece con mayúscula.
-# En los shaders se puede leer la imagen poniendo el nombre de la imagen
-# seguido de "Sampler". Ejemplo: La imagen se llama Hola, así que se lee
-# escribiendo HolaSampler. 
-
 
 defer = ctx.inject(Defer)
 ASSETS_PATH = ctx.directory / f"res/assets/mcgame"
